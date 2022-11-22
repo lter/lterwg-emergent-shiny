@@ -23,8 +23,8 @@ data_v2 <- data_v1 %>%
                 "evergreenForest", "grasslandHerbaceous")) %>%
   # Make a simplified NLCD column
   dplyr::mutate(nlcdClassSimple = dplyr::case_when(
-    nlcdClass == "grasslandHerbaceous" ~ "grassland",
-    nlcdClass %in% c("mixedForest", "deciduousForest", "evergreenForest") ~ "forest",
+    nlcdClass == "grasslandHerbaceous" ~ "Grassland",
+    nlcdClass %in% c("mixedForest", "deciduousForest", "evergreenForest") ~ "Forest",
     TRUE ~ nlcdClass), .after = nlcdClass) %>%
   # Drop impossible coordinates
   dplyr::filter(abs(Longitude) <= 180 & abs(Latitude) <= 90) %>%
