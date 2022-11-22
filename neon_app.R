@@ -20,7 +20,7 @@ neon_ui <- fluidPage(
   # Make app into multiple tabs
   tabsetPanel(
     
-  # UI - Data Table tab ----
+  # UI - Data Table Tab ----
   tabPanel(title = "NEON Data Table",
   
     # Build sidebar with dropdown menus to choose which data to display
@@ -53,7 +53,28 @@ neon_ui <- fluidPage(
                                     width = "100%", height = "auto"))
         
     ) # Close sidebarLayout
-    ) # Close tabPanel
+    ), # Close tabPanel
+  
+  # UI - Graphs Tab ----
+  tabPanel(title = "NEON Graphs",
+           
+           # Build sidebar with dropdown menus to choose which data to display
+           sidebarLayout(position = "left",
+                         sidebarPanel(
+                           selectInput(inputId = "dd_habitat",
+                                       label = htmltools::h3("Select Habitat Type"),
+                                       choices = c("All", unique(table_data$nlcdClassSimple)),
+                                       selected = "All"),
+                           selectInput(inputId = "dd_response",
+                                       label = htmltools::h3("Select Response Variable"),
+                                       choices = c("soilTemp", "soilMoisture"),
+                                       selected = "soilTemp")
+                         ),
+                         
+                         # Main panel
+                         mainPanel(DT::plotOutput(outputId = "soil_plot"))
+           ) # Close sidebarLayout
+  ) # Close tabPanel
   ) # Close tabsetPanel
 ) # Close fluidPage
 
@@ -72,6 +93,29 @@ neon_server <- function(input, output){
   
   # Render the table
   output$table_out <- DT::renderDataTable({ table_sub() })
+  
+  # Server - Graph Tab ----
+  # Summarize the data
+  mean_soil <- table_data %>%
+    dplyr::group_by(siteID, nlcdClassSimple) %>%
+    dplyr::summarize(soilMoisture = mean(soilMoisture, na.rm = T),
+                     soilTemp = mean(soilTemp, na.rm = T),
+                     .groups = "keep") %>%
+    dplyr::ungroup()
+  
+  # Subset to the selected habitat type
+  plot_data <- reactive({
+    if(dd_habitat == "All"){ mean_soil } else { dplyr::filter(mean_soil, nlcdClassSimple == dd_habitat) }
+  })
+  
+  # Make the plot
+  ggplot(data = plot_data, aes(x = siteID, y = .data[[dd_response]], fill = nlcdClassSimple)) +
+    geom_bar(stat = 'identity') +
+    geom_errorbar(aes(ymax = dd_response + .data[[paste0(dd_response, "_SD")]],
+                              ymin = dd_response - .data[[paste0(dd_response, "_SD")]]),
+                   width = 0.2) +
+    theme_bw()
+    
   
 } # Close server function
 
