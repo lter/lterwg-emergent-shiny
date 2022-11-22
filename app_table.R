@@ -17,16 +17,10 @@ library(shinyWidgets)
 
 #Loading in the csv files and showing less than 113 columns
 soilFieldChem <- read.csv(file = 'soilFieldChem.csv')
-<<<<<<< HEAD
-#<<<<<<< HEAD
 grass <- soilFieldChem[grep('grassland|Grassland', soilFieldChem$nlcdClass), ]
 forest <- soilFieldChem[grep('forest|Forest', soilFieldChem$nlcdClass), ]
-#=======
-#>>>>>>> parent of 373efc5... Table less columns and WIP for graphs
 
-=======
-soilFieldChem <- soilFieldChem[-c(72:113)]
->>>>>>> parent of 8edd20a... update .groups error
+# soilFieldChem <- soilFieldChem[-c(72:113)]
 
 ui <- fluidPage(
   titlePanel("Neon Data Table"),
@@ -61,19 +55,8 @@ server <- function(input, output) {
     
   })
   output$table <-DT::renderDataTable({
-    tab()
-    
-  })
-<<<<<<< HEAD
+    tab() })
 } 
-  
-shinyApp(ui = ui, server = server)  
-  
-  
-=======
-}
 
 # Create Shiny app objects from either an explicit UI/server pair 
 shinyApp(ui = ui, server = server)
-
->>>>>>> parent of 8edd20a... update .groups error
