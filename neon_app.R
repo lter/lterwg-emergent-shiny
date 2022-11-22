@@ -64,15 +64,16 @@ neon_ui <- fluidPage(
                            selectInput(inputId = "dd_habitat",
                                        label = htmltools::h3("Select Habitat Type"),
                                        choices = c("All", unique(table_data$nlcdClassSimple)),
-                                       selected = "All"),
-                           selectInput(inputId = "dd_response",
-                                       label = htmltools::h3("Select Response Variable"),
-                                       choices = c("soilTemp", "soilMoisture"),
-                                       selected = "soilTemp")
+                                       selected = "All")
                          ),
                          
                          # Main panel
-                         mainPanel(DT::plotOutput(outputId = "soil_plot"))
+                         mainPanel(
+                           plotOutput(outputId = "plot_soil_temp"),
+                           plotOutput(outputId = "plot_soil_moist"),
+                           plotOutput(outputId = "plot_soil_ixn")
+                           ) # Close mainPanel
+                         
            ) # Close sidebarLayout
   ) # Close tabPanel
   ) # Close tabsetPanel
@@ -95,27 +96,47 @@ neon_server <- function(input, output){
   output$table_out <- DT::renderDataTable({ table_sub() })
   
   # Server - Graph Tab ----
-  # Summarize the data
-  mean_soil <- table_data %>%
-    dplyr::group_by(siteID, nlcdClassSimple) %>%
-    dplyr::summarize(soilMoisture = mean(soilMoisture, na.rm = T),
-                     soilTemp = mean(soilTemp, na.rm = T),
-                     .groups = "keep") %>%
-    dplyr::ungroup()
-  
   # Subset to the selected habitat type
-  plot_data <- reactive({
-    if(dd_habitat == "All"){ mean_soil } else { dplyr::filter(mean_soil, nlcdClassSimple == dd_habitat) }
+  plot_soil_data <- reactive({
+    if(dd_habitat == "All"){ table_data  } else { 
+      table_data %>% 
+        dplyr::filter(nlcdClassSimple == dd_habitat) }
   })
   
-  # Make the plot
-  ggplot(data = plot_data, aes(x = siteID, y = .data[[dd_response]], fill = nlcdClassSimple)) +
-    geom_bar(stat = 'identity') +
-    geom_errorbar(aes(ymax = dd_response + .data[[paste0(dd_response, "_SD")]],
-                              ymin = dd_response - .data[[paste0(dd_response, "_SD")]]),
-                   width = 0.2) +
-    theme_bw()
+  # Make the plots
+  ## Temperature
+  plot_soil_temp <- renderPlot({
+    plot_soil_data %>%
+      dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
+      ggplot(data = ., aes(x = siteID, y = soilTemp, color = soilTemp)) +
+      geom_point() +
+      labs(x = "Site ID", y = "Soil Temperature") +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 35, hjust = 1))
+  })
     
+  ## Moisture
+  plot_soil_moist <- renderPlot({
+    plot_soil_data %>%
+      dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
+      ggplot(data = ., aes(x = siteID, y = soilMoisture, color = soilMoisture)) +
+      geom_point() +
+      labs(x = "Site ID", y = "Soil Moisture") +
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 35, hjust = 1))
+  })
+  
+  ## Relationship between temp & moisture
+  plot_soil_ixn <- renderPlot({
+    plot_soil_data %>%
+      dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
+      dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
+      ggplot(data = ., aes(x = soilTemp, y = soilMoisture, color = nlcdClassSimple)) +
+      geom_point(alpha = 0.4) +
+      geom_smooth(method = "lm", formula = "y ~ x", se = F) +
+      labs(x = "Soil Temperature", y = "Soil Moisture") +
+      theme_bw()
+  })
   
 } # Close server function
 
