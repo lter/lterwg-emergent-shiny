@@ -1,6 +1,7 @@
 ## ------------------------------------------ ##
             # NEON Chemistry App
 ## ------------------------------------------ ##
+# Authors: Dvir Blander, Katrina Newcomer, & Nick Lyon
 
 # Housekeeping ----
 
