@@ -16,12 +16,9 @@ library(shinyWidgets)
 #This can be done by clicking Session --> Set Working Directory --> Choose Directory. Then navigate to this directory.
 
 #Loading in the csv files and showing less than 113 columns
-soilFieldChem <- read.csv(file = file.path('data', 'soilFieldChem.csv'))
-grass <- soilFieldChem[grep('grassland|Grassland', soilFieldChem$nlcdClass), ]
-forest <- soilFieldChem[grep('forest|Forest', soilFieldChem$nlcdClass), ]
+soilFieldChem <- read.csv(file = file.path('data', 'table_data.csv'))
 
-# soilFieldChem <- soilFieldChem[-c(72:113)]
-
+# UI ----
 ui <- fluidPage(
   titlePanel("Neon Data Table"),
   sidebarLayout(position = "left",
@@ -31,21 +28,23 @@ ui <- fluidPage(
                                        label = h3("Select nlcdClass"),
                                        choices =  c("choose" = "", unique(soilFieldChem$nlcdClass)), 
                                        selected = 'mixedForest' ),
-                                      selectInput("selection2", 
-                                                  label = h3("Select siteID"), 
-                                                
-                                                  choices = c("choose" = "", 
-                                                              unique(soilFieldChem$siteID)), selected = 'BART'),
-                                      selectInput("selection4", label = h3("Select biophysicalCriteria"), 
-                                                choices = c("choose" = "", unique(soilFieldChem$biophysicalCriteria)), selected = 'OK - no known exceptions'),
-                                      selectInput("selection5", label = h3("Select sampleTiming"), 
-                                                choices = c("choose" = "", levels(soilFieldChem$sampleTiming)), selected='peakGreenness')
+                           selectInput("selection2", 
+                                       label = h3("Select siteID"),
+                                       choices = c("choose" = "", unique(soilFieldChem$siteID)),
+                                       selected = 'BART'),
+                           selectInput("selection4",
+                                       label = h3("Select biophysicalCriteria"), 
+                                       choices = c("choose" = "", unique(soilFieldChem$biophysicalCriteria)),
+                                       selected = 'OK - no known exceptions'),
+                           selectInput("selection5", label = h3("Select sampleTiming"), 
+                                       choices = c("choose" = "", unique(soilFieldChem$sampleTiming)), 
+                                       selected ='peakGreenness')
                          )
                          
                          
                 ),
                 mainPanel(DT::dataTableOutput("table"))
-   )
+  )
 )
 
 
