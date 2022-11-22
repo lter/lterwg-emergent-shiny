@@ -15,6 +15,8 @@ table_data <- read.csv(file = file.path("data", "table_data.csv"))
 # User Interface (UI) ----
 neon_ui <- fluidPage(
   
+  titlePanel(title = "NEON Chemistry Data Shiny App"),
+  
   # Make app into multiple tabs
   tabsetPanel(
     
