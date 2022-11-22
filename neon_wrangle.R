@@ -16,10 +16,16 @@ data_v1 <- read.csv(file = file.path("data", "soilFieldChem.csv"))
 
 # Wrangling ----
 
-# Subset data to desired entries
+# Streamline data to reduce processing needs of app
 data_v2 <- data_v1 %>%
+  # Pick wanted NLCD classes
   dplyr::filter(nlcdClass %in% c("mixedForest", "deciduousForest",
                 "evergreenForest", "grasslandHerbaceous")) %>%
+  # Make a simplified NLCD column
+  dplyr::mutate(nlcdClassSimple = dplyr::case_when(
+    nlcdClass == "grasslandHerbaceous" ~ "grassland",
+    nlcdClass %in% c("mixedForest", "deciduousForest", "evergreenForest") ~ "forest",
+    TRUE ~ nlcdClass), .after = nlcdClass) %>%
   # Drop impossible coordinates
   dplyr::filter(abs(Longitude) <= 180 & abs(Latitude) <= 90) %>%
   # Fill NAs in other wanted columns with something more descriptive
