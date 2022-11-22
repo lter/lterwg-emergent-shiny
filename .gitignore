@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # Project file
 *.Rproj
+
+# Ignore larger raw data file
+soilFieldChem.csv
