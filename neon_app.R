@@ -6,8 +6,7 @@
 # Housekeeping ----
 
 # Load libraries
-library(tidyverse); library(plotly) # Wrangling / plotting
-library(shiny); library(htmltools); library(DT); library(shinyWidgets) # Shiny et al.
+library(tidyverse); library(shiny); library(htmltools); library(DT); library(shinyWidgets)
 
 # Load data
 table_data <- read.csv(file = file.path("data", "table_data.csv"))
