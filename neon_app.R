@@ -15,6 +15,7 @@ table_data <- read.csv(file = file.path("data", "table_data.csv"))
 # User Interface (UI) ----
 neon_ui <- fluidPage(
   
+  # Global app title
   titlePanel(title = "NEON Chemistry Data Shiny App"),
   
   # Make app into multiple tabs
@@ -98,17 +99,18 @@ neon_server <- function(input, output){
   # Server - Graph Tab ----
   # Subset to the selected habitat type
   plot_soil_data <- reactive({
-    if(dd_habitat == "All"){ table_data  } else { 
+    if(input$dd_habitat == "All"){ table_data } else { 
       table_data %>% 
-        dplyr::filter(nlcdClassSimple == dd_habitat) }
+        dplyr::filter(nlcdClassSimple == input$dd_habitat) }
   })
   
   # Make the plots
   ## Temperature
-  plot_soil_temp <- renderPlot({
-    plot_soil_data %>%
+  output$plot_soil_temp <- renderPlot({
+    plot_soil_data() %>%
       dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
-      ggplot(data = ., aes(x = siteID, y = soilTemp, color = soilTemp)) +
+      ggplot(data = ., aes(x = siteID, y = soilTemp, 
+                           color = soilTemp)) +
       geom_point() +
       labs(x = "Site ID", y = "Soil Temperature") +
       theme_bw() +
@@ -116,10 +118,11 @@ neon_server <- function(input, output){
   })
     
   ## Moisture
-  plot_soil_moist <- renderPlot({
-    plot_soil_data %>%
+  output$plot_soil_moist <- renderPlot({
+    plot_soil_data() %>%
       dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
-      ggplot(data = ., aes(x = siteID, y = soilMoisture, color = soilMoisture)) +
+      ggplot(data = ., aes(x = siteID, y = soilMoisture, 
+                           color = soilMoisture)) +
       geom_point() +
       labs(x = "Site ID", y = "Soil Moisture") +
       theme_bw() +
@@ -127,11 +130,12 @@ neon_server <- function(input, output){
   })
   
   ## Relationship between temp & moisture
-  plot_soil_ixn <- renderPlot({
-    plot_soil_data %>%
+  output$plot_soil_ixn <- renderPlot({
+    plot_soil_data() %>%
       dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
       dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
-      ggplot(data = ., aes(x = soilTemp, y = soilMoisture, color = nlcdClassSimple)) +
+      ggplot(data = ., aes(x = soilTemp, y = soilMoisture, 
+                           color = nlcdClassSimple)) +
       geom_point(alpha = 0.4) +
       geom_smooth(method = "lm", formula = "y ~ x", se = F) +
       labs(x = "Soil Temperature", y = "Soil Moisture") +
