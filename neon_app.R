@@ -57,24 +57,29 @@ neon_ui <- fluidPage(
     ), # Close tabPanel
   
   # UI - Graphs Tab ----
-  tabPanel(title = "NEON Graphs",
+  tabPanel(title = "Soil Graphs",
            
            # Build sidebar with dropdown menus to choose which data to display
            sidebarLayout(position = "left",
                          sidebarPanel(
+                           # Dropdown for habitat selection
                            selectInput(inputId = "dd_habitat",
                                        label = htmltools::h3("Select Habitat Type"),
                                        choices = c("All", unique(table_data$nlcdClassSimple)),
-                                       selected = "All")
+                                       selected = "All"),
+                           # Radio buttons for which plot to make
+                           radioButtons(inputId = "which_plot",
+                                        label = htmltools::h3("Select Desired Plot"),
+                                        choices = c("Soil Temp by Site",
+                                                    "Soil Moisture by Site",
+                                                    "Soil Temp by Soil Moisture"),
+                                        selected = "Soil Temp by Site")
                          ),
                          
                          # Main panel
                          mainPanel(
-                           plotOutput(outputId = "plot_soil_temp"),
-                           plotOutput(outputId = "plot_soil_moist"),
-                           plotOutput(outputId = "plot_soil_ixn")
-                           ) # Close mainPanel
-                         
+                           plotOutput(outputId = "plot_soil")
+                           )
            ) # Close sidebarLayout
   ) # Close tabPanel
   ) # Close tabsetPanel
@@ -105,42 +110,54 @@ neon_server <- function(input, output){
   })
   
   # Make the plots
-  ## Temperature
-  output$plot_soil_temp <- renderPlot({
-    plot_soil_data() %>%
-      dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
-      ggplot(data = ., aes(x = siteID, y = soilTemp, 
-                           color = soilTemp)) +
-      geom_point() +
-      labs(x = "Site ID", y = "Soil Temperature") +
-      theme_bw() +
-      theme(axis.text.x = element_text(angle = 35, hjust = 1))
-  })
-    
-  ## Moisture
-  output$plot_soil_moist <- renderPlot({
-    plot_soil_data() %>%
-      dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
-      ggplot(data = ., aes(x = siteID, y = soilMoisture, 
-                           color = soilMoisture)) +
-      geom_point() +
-      labs(x = "Site ID", y = "Soil Moisture") +
-      theme_bw() +
-      theme(axis.text.x = element_text(angle = 35, hjust = 1))
+ graph_soil <- reactive({
+    # Soil temp ~ site plot
+    if(input$which_plot == "Soil Temp by Site"){
+      plot_soil_data() %>%
+        dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
+        ggplot(data = ., aes(x = siteID, y = soilTemp, 
+                             color = soilTemp)) +
+        geom_jitter(alpha = 0.5, width = 0.25, height = 0) +
+        labs(x = "Site ID", y = "Soil Temperature") +
+        theme_bw() +
+        theme(axis.text.x = element_text(size = 14, angle = 35, hjust = 1),
+              axis.text.y = element_text(size = 16),
+              legend.text = element_text(size = 15),
+              legend.title = element_blank(),
+              axis.title = element_text(size = 20))
+    } else if (input$which_plot == "Soil Moisture by Site"){
+      plot_soil_data() %>%
+        dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
+        ggplot(data = ., aes(x = siteID, y = soilMoisture, 
+                             color = soilMoisture)) +
+        geom_jitter(alpha = 0.5, width = 0.25, height = 0) +
+        labs(x = "Site ID", y = "Soil Moisture") +
+        theme_bw() +
+        theme(axis.text.x = element_text(size = 14, angle = 35, hjust = 1),
+              axis.text.y = element_text(size = 16),
+              legend.text = element_text(size = 15),
+              legend.title = element_blank(),
+              axis.title = element_text(size = 20))
+    } else {
+      plot_soil_data() %>%
+        dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
+        dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
+        ggplot(data = ., aes(x = soilTemp, y = soilMoisture, 
+                             color = nlcdClassSimple)) +
+        geom_point(alpha = 0.4) +
+        geom_smooth(method = "lm", formula = "y ~ x", se = F) +
+        labs(x = "Soil Temperature", y = "Soil Moisture") +
+        scale_color_manual(values = c("Forest" = "#4d9221", "Grassland" = "#c51b7d")) +
+        theme_bw() +
+        theme(axis.text = element_text(size = 16),
+              legend.text = element_text(size = 15),
+              legend.title = element_blank(),
+              axis.title = element_text(size = 20))
+    }
   })
   
-  ## Relationship between temp & moisture
-  output$plot_soil_ixn <- renderPlot({
-    plot_soil_data() %>%
-      dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
-      dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
-      ggplot(data = ., aes(x = soilTemp, y = soilMoisture, 
-                           color = nlcdClassSimple)) +
-      geom_point(alpha = 0.4) +
-      geom_smooth(method = "lm", formula = "y ~ x", se = F) +
-      labs(x = "Soil Temperature", y = "Soil Moisture") +
-      theme_bw()
-  })
+  # Render the created soil plot
+  output$plot_soil <- renderPlot({ graph_soil() })
   
 } # Close server function
 
