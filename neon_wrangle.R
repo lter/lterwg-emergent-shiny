@@ -84,6 +84,6 @@ dplyr::glimpse(data_v2)
 
 # Export broadly pared down data
 write.csv(x = data_v2, na = '', row.names = F,
-          file = file.path("data", "table_data.csv"))
+          file = file.path("data", "app_data.csv"))
 
 # End ----
