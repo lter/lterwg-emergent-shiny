@@ -68,12 +68,12 @@ neon_ui <- fluidPage(
            sidebarLayout(position = "left",
                          sidebarPanel(
                            # Dropdown for habitat selection
-                           selectInput(inputId = "dd_habitat",
+                           selectInput(inputId = "dd_habitat_soil",
                                        label = htmltools::h3("Select Habitat Type"),
                                        choices = c("All", unique(table_data$nlcdClass)),
                                        selected = "All"),
                            # Radio buttons for which plot to make
-                           radioButtons(inputId = "which_plot",
+                           radioButtons(inputId = "which_plot_soil",
                                         label = htmltools::h3("Select Desired Plot"),
                                         choices = c("Soil Temp by Site",
                                                     "Soil Moisture by Site",
@@ -86,7 +86,7 @@ neon_ui <- fluidPage(
                            plotOutput(outputId = "plot_soil")
                            )
            ) # Close sidebarLayout
-  ) # Close tabPanel
+  ), # Close tabPanel
   ) # Close tabsetPanel
 ) # Close fluidPage
 
@@ -105,18 +105,18 @@ neon_server <- function(input, output){
   # Render the table
   output$table_out <- DT::renderDataTable({ table_sub() })
   
-  # Server - Graph Tab ----
+  # Server - Soil Graph Tab ----
   # Subset to the selected habitat type
   plot_soil_data <- reactive({
-    if(input$dd_habitat == "All"){ table_data } else { 
+    if(input$dd_habitat_soil == "All"){ table_data } else { 
       table_data %>% 
-        dplyr::filter(nlcdClass == input$dd_habitat) }
+        dplyr::filter(nlcdClass == input$dd_habitat_soil) }
   })
   
   # Make the plots
  graph_soil <- reactive({
     # Soil temp ~ site plot
-    if(input$which_plot == "Soil Temp by Site"){
+    if(input$which_plot_soil== "Soil Temp by Site"){
       plot_soil_data() %>%
         dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
         ggplot(data = ., aes(x = siteID, y = soilTemp, 
@@ -129,7 +129,7 @@ neon_server <- function(input, output){
               legend.text = element_text(size = 15),
               legend.title = element_blank(),
               axis.title = element_text(size = 20))
-    } else if (input$which_plot == "Soil Moisture by Site"){
+    } else if (input$which_plot_soil== "Soil Moisture by Site"){
       plot_soil_data() %>%
         dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
         ggplot(data = ., aes(x = siteID, y = soilMoisture, 
