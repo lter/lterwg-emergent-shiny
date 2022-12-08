@@ -6,7 +6,8 @@
 # Housekeeping ----
 
 # Load libraries
-library(tidyverse); library(shiny); library(htmltools); library(DT); library(shinyWidgets)
+# install.packages("librarian")
+librarian::shelf(tidyverse, shiny, htmltools, DT, shinyWidgets, lterpalettefinder)
 
 # Load data
 table_data <- read.csv(file = file.path("data", "app_data.csv"))
