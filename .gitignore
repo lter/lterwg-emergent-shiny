@@ -41,5 +41,6 @@ vignettes/*.pdf
 # Project file
 *.Rproj
 
-# Ignore larger raw data file
-soilFieldChem.csv
+# Ignore processed data
+app_data.csv
+
