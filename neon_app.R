@@ -105,6 +105,32 @@ neon_ui <- fluidPage(
                            )
              ) # Close sidebarLayout
     ), # Close tabPanel
+    
+    # UI - pH Graphs Tab ----
+    tabPanel(title = "pH Graphs",
+             
+             # Build sidebar with dropdown menus to choose which data to display
+             sidebarLayout(position = "left",
+                           sidebarPanel(
+                             # Dropdown for habitat selection
+                             selectInput(inputId = "dd_habitat_ph",
+                                         label = htmltools::h3("Select Habitat Type"),
+                                         choices = c("All", unique(table_data$nlcdClass)),
+                                         selected = "All"),
+                             # Radio buttons for which plot to make
+                             radioButtons(inputId = "which_plot_ph",
+                                          label = htmltools::h3("Select Desired Plot"),
+                                          choices = c("pH by Site"),
+                                          selected = "pH by Site")
+                           ),
+                           
+                           # Main panel
+                           mainPanel(
+                             htmltools::h1("Plots under construction, check back later!")
+                             # plotOutput(outputId = "plot_ph")
+                           )
+             ) # Close sidebarLayout
+    ), # Close tabPanel
   ) # Close tabsetPanel
 ) # Close fluidPage
 
