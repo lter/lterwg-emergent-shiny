@@ -1,5 +1,5 @@
 ## ------------------------------------------ ##
-            # NEON Chemistry App
+# NEON Chemistry App
 ## ------------------------------------------ ##
 # Authors: Dvir Blander, Katrina Newcomer, & Nick Lyon
 
@@ -30,63 +30,81 @@ neon_ui <- fluidPage(
   # Make app into multiple tabs
   tabsetPanel(
     
-  # UI - Data Table Tab ----
-  tabPanel(title = "NEON Data Table",
-  
-    # Build sidebar with dropdown menus to choose which data to display
-    sidebarLayout(position = "left",
-      
-      # Sidebar
-      sidebarPanel(
-        
-        # Dropdowns
-        selectInput(inputId = "dd_nlcdClass",
-                    label = htmltools::h3("Select nlcdClass"),
-                    choices = unique(table_data$nlcdClass),
-                    selected = unique(table_data$nlcdClass)[1]),
-        selectInput(inputId = "dd_biophysicalCriteria",
-                    label = htmltools::h3("Select biophysicalCriteria"),
-                    choices = unique(table_data$biophysicalCriteria),
-                    selected = unique(table_data$biophysicalCriteria)[1]),
-        selectInput(inputId = "dd_sampleTiming",
-                    label = htmltools::h3("Select sampleTiming"),
-                    choices = unique(table_data$sampleTiming),
-                    selected = unique(table_data$sampleTiming)[1])
-      ), # Close sidebar
-      
-      # Main panel
-      mainPanel(DT::dataTableOutput(outputId = "table_out",
-                                    width = "100%", height = "auto"))
-        
-    ) # Close sidebarLayout
+    # UI - Overview Tab ----
+    tabPanel(title = "Overview",
+             
+             # Add informative text
+             htmltools::h2("Under Construction"),
+
+             # Add more text
+             "More specific content to be added here.",
+             
+             # Add a line break
+             htmltools::br(),
+             
+             # Insert logos
+             img(src = "neon_logo.png", height = 100, align = "center"),
+             img(src = "lter_logo.png", height = 100, align = "center")
+             
     ), # Close tabPanel
-  
-  # UI - Soil Graphs Tab ----
-  tabPanel(title = "Soil Graphs",
-           
-           # Build sidebar with dropdown menus to choose which data to display
-           sidebarLayout(position = "left",
-                         sidebarPanel(
-                           # Dropdown for habitat selection
-                           selectInput(inputId = "dd_habitat_soil",
-                                       label = htmltools::h3("Select Habitat Type"),
-                                       choices = c("All", unique(table_data$nlcdClass)),
-                                       selected = "All"),
-                           # Radio buttons for which plot to make
-                           radioButtons(inputId = "which_plot_soil",
-                                        label = htmltools::h3("Select Desired Plot"),
-                                        choices = c("Soil Temp by Site",
-                                                    "Soil Moisture by Site",
-                                                    "Soil Temp by Soil Moisture"),
-                                        selected = "Soil Temp by Site")
-                         ),
-                         
-                         # Main panel
-                         mainPanel(
-                           plotOutput(outputId = "plot_soil")
+    
+    # UI - Data Table Tab ----
+    tabPanel(title = "NEON Data Table",
+             
+             # Build sidebar with dropdown menus to choose which data to display
+             sidebarLayout(position = "left",
+                           
+                           # Sidebar
+                           sidebarPanel(
+                             
+                             # Dropdowns
+                             selectInput(inputId = "dd_nlcdClass",
+                                         label = htmltools::h3("Select nlcdClass"),
+                                         choices = unique(table_data$nlcdClass),
+                                         selected = unique(table_data$nlcdClass)[1]),
+                             selectInput(inputId = "dd_biophysicalCriteria",
+                                         label = htmltools::h3("Select biophysicalCriteria"),
+                                         choices = unique(table_data$biophysicalCriteria),
+                                         selected = unique(table_data$biophysicalCriteria)[1]),
+                             selectInput(inputId = "dd_sampleTiming",
+                                         label = htmltools::h3("Select sampleTiming"),
+                                         choices = unique(table_data$sampleTiming),
+                                         selected = unique(table_data$sampleTiming)[1])
+                           ), # Close sidebar
+                           
+                           # Main panel
+                           mainPanel(DT::dataTableOutput(outputId = "table_out",
+                                                         width = "100%", height = "auto"))
+                           
+             ) # Close sidebarLayout
+    ), # Close tabPanel
+    
+    # UI - Soil Graphs Tab ----
+    tabPanel(title = "Soil Graphs",
+             
+             # Build sidebar with dropdown menus to choose which data to display
+             sidebarLayout(position = "left",
+                           sidebarPanel(
+                             # Dropdown for habitat selection
+                             selectInput(inputId = "dd_habitat_soil",
+                                         label = htmltools::h3("Select Habitat Type"),
+                                         choices = c("All", unique(table_data$nlcdClass)),
+                                         selected = "All"),
+                             # Radio buttons for which plot to make
+                             radioButtons(inputId = "which_plot_soil",
+                                          label = htmltools::h3("Select Desired Plot"),
+                                          choices = c("Soil Temp by Site",
+                                                      "Soil Moisture by Site",
+                                                      "Soil Temp by Soil Moisture"),
+                                          selected = "Soil Temp by Site")
+                           ),
+                           
+                           # Main panel
+                           mainPanel(
+                             plotOutput(outputId = "plot_soil")
                            )
-           ) # Close sidebarLayout
-  ), # Close tabPanel
+             ) # Close sidebarLayout
+    ), # Close tabPanel
   ) # Close tabsetPanel
 ) # Close fluidPage
 
@@ -114,7 +132,7 @@ neon_server <- function(input, output){
   })
   
   # Make the plots
- graph_soil <- reactive({
+  graph_soil <- reactive({
     # Soil temp ~ site plot
     if(input$which_plot_soil== "Soil Temp by Site"){
       plot_soil_data() %>%
