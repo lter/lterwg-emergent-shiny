@@ -9,6 +9,7 @@
 rm(list = ls())
 
 # Load libraries
+# install.packages("tidyverse")
 library(tidyverse)
 
 # Load data
@@ -18,14 +19,20 @@ data_v1 <- read.csv(file = file.path("data", "soilFieldChem.csv"))
 
 # Streamline data to reduce processing needs of app
 data_v2 <- data_v1 %>%
-  # Pick wanted NLCD classes
-  dplyr::filter(nlcdClass %in% c("mixedForest", "deciduousForest",
-                "evergreenForest", "grasslandHerbaceous")) %>%
-  # Make a simplified NLCD column
-  dplyr::mutate(nlcdClassSimple = dplyr::case_when(
-    nlcdClass == "grasslandHerbaceous" ~ "Grassland",
-    nlcdClass %in% c("mixedForest", "deciduousForest", "evergreenForest") ~ "Forest",
-    TRUE ~ nlcdClass), .after = nlcdClass) %>%
+  # Change format of NLCD Classes
+  dplyr::mutate(nlcdClass = dplyr::case_when(
+    nlcdClass == "cultivatedCrops" ~ "Cultivated Crops",
+    nlcdClass == "deciduousForest" ~ "Deciduous Forest",
+    nlcdClass == "dwarfScrub" ~ "Dwarf Scrub",
+    nlcdClass == "emergentHerbaceousWetlands" ~ "Emergent Herbaceous Wetlands",
+    nlcdClass == "evergreenForest" ~ "Evergreen Forest",
+    nlcdClass == "grasslandHerbaceous" ~ "Grassland Herbaceous",
+    nlcdClass == "mixedForest" ~ "Mixed Forest",
+    nlcdClass == "pastureHay" ~ "Pasture Hay",
+    nlcdClass == "sedgeHerbaceous" ~ "Sedge Herbaceous",
+    nlcdClass == "shrubScrub" ~ "Shrub Scrub",
+    nlcdClass == "woodyWetlands" ~ "Woody Wetlands",
+    TRUE ~ nlcdClass)) %>%
   # Drop impossible coordinates
   dplyr::filter(abs(Longitude) <= 180 & abs(Latitude) <= 90) %>%
   # Fill NAs in other wanted columns with something more descriptive
