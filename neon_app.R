@@ -9,7 +9,7 @@
 library(tidyverse); library(shiny); library(htmltools); library(DT); library(shinyWidgets)
 
 # Load data
-table_data <- read.csv(file = file.path("data", "table_data.csv"))
+table_data <- read.csv(file = file.path("data", "app_data.csv"))
 
 # User Interface (UI) ----
 neon_ui <- fluidPage(
@@ -34,10 +34,6 @@ neon_ui <- fluidPage(
                     label = htmltools::h3("Select nlcdClass"),
                     choices = unique(table_data$nlcdClass),
                     selected = unique(table_data$nlcdClass)[1]),
-        selectInput(inputId = "dd_siteID",
-                    label = htmltools::h3("Select siteID"),
-                    choices = unique(table_data$siteID),
-                    selected = unique(table_data$siteID)[1]),
         selectInput(inputId = "dd_biophysicalCriteria",
                     label = htmltools::h3("Select biophysicalCriteria"),
                     choices = unique(table_data$biophysicalCriteria),
@@ -55,7 +51,7 @@ neon_ui <- fluidPage(
     ) # Close sidebarLayout
     ), # Close tabPanel
   
-  # UI - Graphs Tab ----
+  # UI - Soil Graphs Tab ----
   tabPanel(title = "Soil Graphs",
            
            # Build sidebar with dropdown menus to choose which data to display
@@ -64,7 +60,7 @@ neon_ui <- fluidPage(
                            # Dropdown for habitat selection
                            selectInput(inputId = "dd_habitat",
                                        label = htmltools::h3("Select Habitat Type"),
-                                       choices = c("All", unique(table_data$nlcdClassSimple)),
+                                       choices = c("All", unique(table_data$nlcdClass)),
                                        selected = "All"),
                            # Radio buttons for which plot to make
                            radioButtons(inputId = "which_plot",
@@ -92,7 +88,6 @@ neon_server <- function(input, output){
   table_sub <- reactive({
     table_data %>%
       dplyr::filter(nlcdClass == input$dd_nlcdClass) %>%
-      dplyr::filter(siteID == input$dd_siteID) %>%
       dplyr::filter(biophysicalCriteria == input$dd_biophysicalCriteria) %>%
       dplyr::filter(sampleTiming == input$dd_sampleTiming)
   })
@@ -105,7 +100,7 @@ neon_server <- function(input, output){
   plot_soil_data <- reactive({
     if(input$dd_habitat == "All"){ table_data } else { 
       table_data %>% 
-        dplyr::filter(nlcdClassSimple == input$dd_habitat) }
+        dplyr::filter(nlcdClass == input$dd_habitat) }
   })
   
   # Make the plots
