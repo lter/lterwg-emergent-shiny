@@ -12,6 +12,15 @@ librarian::shelf(tidyverse, shiny, htmltools, DT, shinyWidgets, lterpalettefinde
 # Load data
 table_data <- read.csv(file = file.path("data", "app_data.csv"))
 
+# Grab a palette for use in plots
+full_palette <- lterpalettefinder::palette_find(type = "qualitative", 
+                                                name = "lotus",
+                                                site = "HBR")
+
+# Grab a palette for the soil data
+nlcd_palette <- lterpalettefinder::palette_subsample(palette = full_palette,
+                                                     wanted = length(unique(table_data$nlcdClass)))
+
 # User Interface (UI) ----
 neon_ui <- fluidPage(
   
@@ -135,14 +144,15 @@ neon_server <- function(input, output){
               axis.title = element_text(size = 20))
     } else {
       plot_soil_data() %>%
-        dplyr::filter(soilMoisture > -3 & !is.na(soilMoisture)) %>%
+        dplyr::filter(soilMoisture > -3) %>%
         dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
+        dplyr::filter(!is.na(soilTemp) & !is.na(soilMoisture)) %>%
         ggplot(data = ., aes(x = soilTemp, y = soilMoisture, 
-                             color = nlcdClassSimple)) +
+                             color = nlcdClass)) +
         geom_point(alpha = 0.4) +
         geom_smooth(method = "lm", formula = "y ~ x", se = F) +
         labs(x = "Soil Temperature", y = "Soil Moisture") +
-        scale_color_manual(values = c("Forest" = "#4d9221", "Grassland" = "#c51b7d")) +
+        scale_color_manual(values = soil_palette) +
         theme_bw() +
         theme(axis.text = element_text(size = 16),
               legend.text = element_text(size = 15),
