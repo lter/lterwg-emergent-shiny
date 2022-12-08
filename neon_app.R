@@ -1,5 +1,5 @@
 ## ------------------------------------------ ##
-# NEON Chemistry App
+            # NEON Chemistry App
 ## ------------------------------------------ ##
 # Authors: Dvir Blander, Katrina Newcomer, & Nick Lyon
 
