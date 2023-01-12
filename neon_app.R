@@ -10,6 +10,8 @@
 librarian::shelf(tidyverse, shiny, htmltools, DT, shinyWidgets, lterpalettefinder)
 
 # Load data
+## Note that "app_data.csv" is created by running "neon_wrangle.R"
+## You *must* run "neon_wrangle" until "app_data.csv" is written into the "data" folder
 table_data <- read.csv(file = file.path("data", "app_data.csv"))
 
 # Grab a palette for use in plots
