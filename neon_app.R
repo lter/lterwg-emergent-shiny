@@ -198,6 +198,7 @@ neon_server <- function(input, output){
         geom_point(alpha = 0.4) +
         geom_smooth(method = "lm", formula = "y ~ x", se = F) +
         labs(x = "Soil Temperature", y = "Soil Moisture") +
+        scale_fill_manual(values = nlcd_palette) +
         theme_bw() +
         theme(axis.text = element_text(size = 16),
               legend.text = element_text(size = 15),
