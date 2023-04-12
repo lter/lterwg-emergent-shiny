@@ -15,8 +15,7 @@ librarian::shelf(tidyverse, shiny, htmltools, DT, shinyWidgets, lterpalettefinde
 table_data <- read.csv(file = file.path("data", "app_data.csv"))
 
 # Grab a palette for use in plots
-full_palette <- lterpalettefinder::palette_find(type = "qualitative", 
-                                                name = "lotus",
+full_palette <- lterpalettefinder::palette_find(type = "qualitative", name = "lotus",
                                                 site = "HBR")
 
 # Grab a palette for the soil data
@@ -113,7 +112,15 @@ neon_ui <- fluidPage(
                                           choices = c("Soil Temp by Site",
                                                       "Soil Moisture by Site",
                                                       "Soil Temp by Soil Moisture"),
-                                          selected = "Soil Temp by Site")
+                                          selected = "Soil Temp by Site"),
+                             # Slider for year range
+                             sliderInput(inputId = "soil_years",
+                                         label = htmltools::h3("Choose Date Range"),
+                                         min = min(table_data$collectYear),
+                                         max = max(table_data$collectYear),
+                                         step = 1, sep = "",
+                                         value = c(min(table_data$collectYear),
+                                                   max(table_data$collectYear)) )
                            ),
                            
                            # Main panel
@@ -167,17 +174,24 @@ neon_server <- function(input, output){
   output$table_out <- DT::renderDataTable({ table_sub() })
   
   # Server - Soil Graph Tab ----
+  
   # Subset to the selected habitat type
-  plot_soil_data <- reactive({
+  plot_soil_data_v1 <- reactive({
     if(input$dd_habitat_soil == "All"){ table_data } else { 
       table_data %>% 
         dplyr::filter(nlcdClass == input$dd_habitat_soil) }
   })
   
+  # Subset to desired years (from slider)
+  plot_soil_data <- reactive({
+    plot_soil_data_v1() %>%
+      subset(collectYear >= input$soil_years[1] & collectYear <= input$soil_years[2])
+  })
+  
   # Make the plots
   graph_soil <- reactive({
     # Soil temp ~ site plot
-    if(input$which_plot_soil== "Soil Temp by Site"){
+    if(input$which_plot_soil == "Soil Temp by Site"){
       plot_soil_data() %>%
         dplyr::filter(abs(soilTemp) <= 75 & !is.na(soilTemp)) %>%
         ggplot(data = ., aes(x = siteID, y = soilTemp, 
