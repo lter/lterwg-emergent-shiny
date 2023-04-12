@@ -36,13 +36,28 @@ neon_ui <- fluidPage(
     tabPanel(title = "Overview",
              
              # Add informative text
-             htmltools::h2("Under Construction"),
-
-             # Add more text
-             "More specific content to be added here.",
+             htmltools::h2("Ecological Metagenome-derived Reference Genomes and Traits (EMERGENT)"),
              
-             # Add a line break
-             htmltools::br(),
+             # Add more text
+             "Our climate crisis, resulting from changes in interacting climate variables (temperature, rainfall, atmospheric chemistry) over the last century, has impacted all ecosystems on the surface of the Earth. The Ecological Metagenome-derived Reference Genomes and Traits (EMERGENT) synthesis project connects genomic information about the soil microbiome with the broader ecological context. Our work will advance efforts to harmonize molecular information for microbial taxa and their functional traits, streamline their use in syntheses with related ecosystem level data, and enable future metagenomic studies to leverage EDI environmental data, spurring future microbial ecology research at LTER sites.",
+             
+             # Line break
+             htmltools::br(), htmltools::br(),
+             
+             # Link to website
+             htmltools::strong(
+               "For more information on the EMERGENT project, please visit ",
+               htmltools::a(href = "https://lter.github.io/lterwg-emergent-website/",
+                            "our website.", target = "_blank")),
+             
+             # Add some line spacing
+             htmltools::br(), htmltools::br(),
+             
+             # Describe app
+             "This Shiny app is meant to allow interested parties to explore portions of the datasets that are particularly relevant to the EMERGENT synthesis project's hypotheses and questions.",
+             
+             # Add more line spacing
+             htmltools::br(), htmltools::br(), htmltools::br(),
              
              # Insert logos
              img(src = "neon_logo.png", height = 100, align = "center"),
