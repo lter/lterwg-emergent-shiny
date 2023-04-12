@@ -72,7 +72,11 @@ data_v2 <- data_v1 %>%
                 -isoRemarks, -isoInstrument, -plotID.y,
                 -dryMassFraction.x, -dryMassFraction.y,
                 -collectDate.y,
-                -dplyr::starts_with("genetic"))
+                -dplyr::starts_with("genetic")) %>%
+  # Strip collection year from collection date character
+  dplyr::mutate(collectYear = as.numeric(stringr::str_extract(string = collectDate, 
+                                                              pattern = "[:digit:]{4}")),
+                .after = collectDate)
 
 # Check which columns were dropped
 setdiff(x = names(data_v1), y = names(data_v2))
